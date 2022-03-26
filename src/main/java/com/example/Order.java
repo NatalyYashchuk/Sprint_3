@@ -1,3 +1,5 @@
+package com.example;
+
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class Order {
     private String createdAt;
     private String updatedAt;
     private Integer status;
+
 
 
     public Order(Integer id, Integer courierId, String firstName, String lastName, String address,

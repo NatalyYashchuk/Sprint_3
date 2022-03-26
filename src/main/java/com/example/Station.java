@@ -1,3 +1,5 @@
+package com.example;
+
 public class Station {
     private String name;
     private String number;

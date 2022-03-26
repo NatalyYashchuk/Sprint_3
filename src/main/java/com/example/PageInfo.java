@@ -1,3 +1,5 @@
+package com.example;
+
 public class PageInfo {
     private Integer page;
     private Integer total;

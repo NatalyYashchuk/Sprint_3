@@ -1,3 +1,5 @@
+package com.example;
+
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
@@ -9,11 +11,11 @@ public class Utils {
 
         // метод randomAlphabetic генерирует строку, состоящую только из букв, в качестве параметра передаём длину строки
         for(int i = 0; i< quantity; i++) {
-            String courierLogin = RandomStringUtils.randomAlphabetic(10);
+            String courierLogin = RandomStringUtils.randomAlphabetic(100);
             // с помощью библиотеки RandomStringUtils генерируем пароль
-            String courierPassword = RandomStringUtils.randomAlphabetic(10);
+            String courierPassword = RandomStringUtils.randomAlphabetic(100);
             // с помощью библиотеки RandomStringUtils генерируем имя курьера
-            String courierFirstName = RandomStringUtils.randomAlphabetic(10);
+            String courierFirstName = RandomStringUtils.randomAlphabetic(100);
 
             courierDataArray.add(courierLogin);
             courierDataArray.add(courierPassword);

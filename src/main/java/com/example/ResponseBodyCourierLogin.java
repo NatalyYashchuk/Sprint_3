@@ -1,3 +1,5 @@
+package com.example;
+
 public class ResponseBodyCourierLogin {
 
     private Integer id;

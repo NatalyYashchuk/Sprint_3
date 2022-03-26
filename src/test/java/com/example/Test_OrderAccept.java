@@ -1,19 +1,23 @@
 package com.example;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class Test_OrderAccept {
     private ArrayList<String> courierData ;
-    private List<Integer> idListToDelete = new ArrayList<>();
-
+    private List<Integer> courierListToDelete = new ArrayList<>();
+    private List<Integer> trackOrderListToDelete = new ArrayList<>();
     private Courier courier;
     private CourierLogin courierLogin;
     private  Order order;
@@ -39,20 +43,38 @@ public class Test_OrderAccept {
 
         courier = Test_CourierLogin.courierCreate(login, password, firstName);
         courierId = Test_OrderListGet.getCourierIdCertainCourier(courier);
-        System.out.println("Courier id = " + courierId + "  Courier login" + login + "  Courier password" + password);
-        trackOrder = Test_OrderListGet.getTrackOfOrderMetroStation("1");
-        System.out.println("Order track =  " + trackOrder);
-        id  = Test_OrderListGet.getOrderId(trackOrder);
-        System.out.println("Order id = " + id);
+        courierListToDelete.add(courierId);
 
+        trackOrder = Test_OrderListGet.getTrackOfOrderMetroStation("1");
+        trackOrderListToDelete.add(trackOrder);
+        id  = Test_OrderListGet.getOrderId(trackOrder);
     }
 
     @Test
     @DisplayName("COurier accept an Order. Result 200")
     @Description("Create a courier, Create an Order, Accept An Order")
-    public void courierAcceptAnOrder() {
+    public void testCourierAcceptAnOrder() {
         Response response = Test_OrderListGet.courierAcceptOrder(id,courierId);
         response.then().assertThat().statusCode(200);
     }
+
+    @After
+    public void standClear() {
+        Test_CourierCreate.deleteAllCouriers(courierListToDelete);
+        deleteAllOrders(trackOrderListToDelete);
+    }
+
+    @Step("Order cancel doesn't work properly.")
+    public static void deleteAllOrders(List<Integer> trackOrdersListToDelete) {
+
+        for(Integer orderTrack: trackOrdersListToDelete) {
+            Response responseCourierDelete = Test_OrderCreateColorParametrized.orderCancel(orderTrack);
+
+        }
+
+        trackOrdersListToDelete.clear();
+    }
+
+
 
 }

@@ -1,3 +1,7 @@
+package com.example;
+
+import com.example.Order;
+import com.example.OrderCancelPutBody;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
@@ -25,9 +29,13 @@ public  class Test_OrderCreateColorParametrized {
     private  List<String> colorList;              //changing parameter
     private List<Integer> idListToDelete = new ArrayList<>();
     private Integer track;
+     private Order order;
 
     @Before
     public void setUp() {RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru/";
+        order = Order.defaultOrderGet();
+        order.setColor(colorList);
+
     }
 
     public Test_OrderCreateColorParametrized(List<String> colorList){
@@ -46,12 +54,9 @@ public  class Test_OrderCreateColorParametrized {
     }
 
     @Test
-    @DisplayName("Create an order successfully /api/v1/orders")
+    @DisplayName("Create an order successfully. Check status Code = 201 /api/v1/orders")
     @Description("It's possible to create  a new order.")
     public void orderCreateSuccessfully(){
-        Order order = Order.defaultOrderGet();
-        order.setColor(colorList);
-
         Response responsePostOrder = sendPostRequestOrderCreate(order);
         System.out.println(responsePostOrder.body().asString());
         responsePostOrder.then().assertThat()
@@ -59,33 +64,29 @@ public  class Test_OrderCreateColorParametrized {
     }
 
     @Test
-    @DisplayName("Create an order successfully /api/v1/orders")
-    @Description("It's possible to create  a new order.")
+    @DisplayName(" Order track received successfully /api/v1/orders")
+    @Description("It's possible to receive track of the just created track.")
     public void orderCreateSuccessfullyHasTrack(){
-        Order order = Order.defaultOrderGet();
-        order.setColor(colorList);
-
         Response responsePostOrder = sendPostRequestOrderCreate(order);
-        System.out.println(responsePostOrder.body().asString());
-        responsePostOrder.then().assertThat().body("track", notNullValue());
         Order orderBody = responsePostOrder.as(Order.class);
         Integer track = orderBody.getTrack();
-        System.out.println("track=" + track);
+
         idListToDelete.add(track);
     }
 
     @After
+    @Step("Cancel all Orders from the list to clear the TestStand.Doesn't work properly")
     public void cancelAllOrders (){
 
         for(Integer cancelTrack: idListToDelete) {
             Response responseCancelOrder = orderCancel(cancelTrack);
-            responseCancelOrder.then().assertThat().body("ok", equalTo(true));
+
         }
 
         idListToDelete.clear();
     }
 
-    @Step("Send Post request to create an Order to /api/v1/orders")
+    @Step("Send Post request to create an com.example.Order to /api/v1/orders")
     public  static  Response sendPostRequestOrderCreate(Order order) {
         Response createOrderResponse = given().filters(new RequestLoggingFilter(), new ResponseLoggingFilter())
                 .header("Content-type", "application/json")
@@ -93,10 +94,11 @@ public  class Test_OrderCreateColorParametrized {
         return createOrderResponse;
     }
 
-    public Response orderCancel(Integer track){
+    @Step("Cancel  Order by put to /api/v1/orders/cancel")
+    public static Response orderCancel(Integer track){
         OrderCancelPutBody order = new OrderCancelPutBody(track);
         System.out.println("Track to cancel = "  + track);
-        Response orderCancelingResponse = given().filters(new RequestLoggingFilter(), new ResponseLoggingFilter())
+        Response orderCancelingResponse = given()
                 .header("Content-type", "application/json")
                 .and().body(order).when().put("/api/v1/orders/cancel");
         return orderCancelingResponse;

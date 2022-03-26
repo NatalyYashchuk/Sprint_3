@@ -1,3 +1,5 @@
+package com.example;
+
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import io.qameta.allure.Description;
@@ -40,7 +42,7 @@ public class Test_CourierCreate {
     @Test
     @DisplayName("Create a courier successfully /api/v1/courier")
     @Description ("It's possible to create  a new courier.")
-    public void courierNewCreateSuccessfully() {
+    public void testCourierNewCreateSuccessfully() {
         Response responsePost = sendPostRequestCourier(courier);
 
         responsePost.then().assertThat().body("ok",equalTo(true))
@@ -55,8 +57,8 @@ public class Test_CourierCreate {
 
     @Test
     @DisplayName("Return correct response code  /api/v1/courier")
-    @Description ("Create Courier successfully. Return correct response code")
-    public void courierCreateSuccessfullyResponceCodeCorrect() {
+    @Description ("Create com.example.Courier successfully. Return correct response code")
+    public void testCourierCreateSuccessfullyResponceCodeCorrect() {
         Response responsePost = sendPostRequestCourier(courier);
         System.out.println(responsePost.body().asString());
         responsePost.then().assertThat()
@@ -70,7 +72,7 @@ public class Test_CourierCreate {
     @Test
     @DisplayName("Two the same couriers can't be created  /api/v1/courier")
     @Description ("It's impossible to create the second courier with the same obligatory field values")
-    public void courierTheSameCreateImpossible() {
+    public void testCourierTheSameCreateImpossible() {
         Response responsePostFirst = sendPostRequestCourier(courier);
                 responsePostFirst.then().assertThat().body("ok",equalTo(true));
 
@@ -89,8 +91,8 @@ public class Test_CourierCreate {
 
     @Test
     @DisplayName("Can't create a courier without an obligatory field /api/v1/courier")
-    @Description ("It's impossible to create a courier if any obligatory field equals to null")
-    public void courierWithObligatoryFieldsOnlyCreateSuccessfully() {
+    @Description ("It's impossible to create a courier if any obligatory field equals to null. Status code 400")
+    public void testCourierWithObligatoryFieldsOnlyCreateSuccessfully() {
 
         for(int i = 0; i < courierData.size(); i++){
             courierData = Utils.getCourierData(fieldsSet, signsQuantity);
@@ -113,7 +115,7 @@ public class Test_CourierCreate {
     @Test
     @DisplayName("Can't create a courier with login which is used   /api/v1/courier")
     @Description("It's impossible to create a courier with login  which is used already")
-    public void courierWithUsedLoginCreateImpossible() {
+    public void testCourierWithUsedLoginCreateImpossible() {
 
         Response responsePostFirst = sendPostRequestCourier(courier);
         responsePostFirst.then().assertThat().body("ok",equalTo(true));
@@ -133,18 +135,21 @@ public class Test_CourierCreate {
     }
 
    @After
-    public void deleteAllCouriers() {
+   public void clearStand() {
+        deleteAllCouriers(idListToDelete);
+   }
 
-       for(Integer courierId: idListToDelete) {
-           Response responseCourierDelete = deleteCourier(courierId);
-           responseCourierDelete.then().assertThat().body("ok", equalTo(true));
-       }
 
-       idListToDelete.clear();
+    @Step("Delete all created couriers")
+    public static void deleteAllCouriers(List<Integer> idListToDelete) {
+
+        for(Integer courierId: idListToDelete) {
+            Response responseCourierDelete = deleteCourier(courierId);
+            responseCourierDelete.then().assertThat().body("ok", equalTo(true));
+        }
+
+        idListToDelete.clear();
     }
-
-
-
 
     @Step("Send Post request CourierCreate to /api/v1/courier")
     public  static  Response sendPostRequestCourier(Courier courier) {
@@ -153,7 +158,7 @@ public class Test_CourierCreate {
     }
 
 
-    @Step("Send Delete Courier request /api/v1/courier/:id")
+    @Step("Send Delete com.example.Courier request /api/v1/courier/:id")
     public static Response deleteCourier(Integer courierId) {
         DeletePostBody deletePostBody = new DeletePostBody(courierId.toString());
         Response deleteResponce = given().header("Content-type", "application/json").and().body(deletePostBody).when().delete("/api/v1/courier/" + courierId);

@@ -1,11 +1,13 @@
 package com.example;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,12 +16,21 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public class Test_OrderList {
+public class Test_OrderListGet {
     private ArrayList<String> courierData ;
     private List<Integer> idListToDelete = new ArrayList<>();
 
     private Courier courier;
     private CourierLogin courierLogin;
+    private  Order order;
+    private String login;
+    private String password;
+    private String firstName;
+    private Integer courierId;
+    private Integer trackOrder;
+    private Integer id;
+    private Integer trackOrder2;
+    private Integer id2;
     int fieldsSet;
     int signsQuantity;
 
@@ -30,64 +41,120 @@ public class Test_OrderList {
         signsQuantity = 10;
 
         courierData = Utils.getCourierData(fieldsSet, signsQuantity);
-        courier = new Courier(courierData.get(0), courierData.get(1), courierData.get(2));
-        courierLogin = new CourierLogin(courier.getLogin(),courier.getPassword());
+        login = courierData.get(0);
+        password = courierData.get(1);
+        firstName = courierData.get(2);
+
+        courier = Test_CourierLogin.courierCreate(login, password, firstName);
+        courierId = getCourierIdCertainCourier(courier);
+
+        trackOrder = getTrackOfOrderMetroStation("1");
+        id  = getOrderId(trackOrder);
+
+        trackOrder2 = getTrackOfOrderMetroStation("2");
+        id2  = getOrderId(trackOrder2);
+
     }
 
 
     @Test
     @DisplayName("Get an com.example.Order List ")
     @Description("Get  order list of the all couriers.")
-    public void courierNewCreateSuccessfully() {
-        Response responsePost = Test_CourierCreate.sendPostRequestCourier(courier);
+    public void orderFindInListSuccessfully() {
+        Assert.assertNotNull(getResponseOfGetList().getOrders());
+    }
 
-        responsePost.then().assertThat().statusCode(201);
+    @Test
+    @DisplayName("Get a courier order list  with different metro Stations. ")
+    @Description("The courier get an order list successfully with metro Station1 and metroStation 2 orders.")
+    public void getOrderListOfCertainCourierSuccessfully() {
+        Assert.assertNotNull(getResponseCourierGetList(courierId).getOrders());
+    }
 
-        Integer id = Test_CourierLogin.getCourierIdFromLogin(courierLogin); //new courier login and get id
-        System.out.println(id);
-        Order orderForListCreate = Order.defaultOrderGet();
+    @Test
+    @DisplayName("Get a courier order list  with accepted and non-accepted orders.")
+    @Description("Check whether certain courier accepted and non-accepted orders are in the orders list.")
+    public void getOrderListOfCertainCourier() {
+    Response response = courierAcceptOrder(id,courierId);
+    response.then().assertThat().statusCode(200);
+    Integer idCheck1 = id;
+    Integer idCheck2 = id2+1;
 
-        Response responsePostOrder = Test_OrderCreateColorParametrized.sendPostRequestOrderCreate(orderForListCreate);
-        responsePostOrder.then().assertThat().statusCode(201);
+    List<Integer> ordersTrackList = getOrdersIdFromCourierList(courierId);
 
-        Order orderForListCreate2 = Order.defaultOrderGet();
-        Response responsePostOrder2 = Test_OrderCreateColorParametrized.sendPostRequestOrderCreate(orderForListCreate2);
-        responsePostOrder2.then().assertThat().statusCode(201);
+    Assert.assertTrue(ordersTrackList.contains(idCheck1));
+    Assert.assertTrue(ordersTrackList.contains(idCheck2));
+    }
 
-
-//        Response response = getResponseOfGetList();
-//        System.out.println(response.body().asString());
-        OrdersList ordersListGet = given().filters(new RequestLoggingFilter(), new ResponseLoggingFilter())
-                .header("Content-type", "application/json")
-                .get("/api/v1/orders").body().as(OrdersList.class);
-
-        System.out.println(ordersListGet.getPageInfo());
-        System.out.println("Orders: " + ordersListGet.getOrders() + "\n"
-                + "Stations: " + ordersListGet.getAvailableStations() + "\n"
-                + "com.example.PageInfo: " + ordersListGet.getPageInfo());
-
-
+    @Step ("Get an id list of the certain courier orders.")
+    private List<Integer> getOrdersIdFromCourierList(Integer courierId) {
+        Integer ordersSize = getResponseCourierGetList(courierId).getOrders().size();
+        List<Integer> ordersIdList = new ArrayList<>();
+        Integer orderIdFromList;
+        for (int i = 0; i < ordersSize; i++){
+            orderIdFromList = getResponseCourierGetList(courierId).getOrders().get(i).getId();
+            ordersIdList.add(orderIdFromList);
+        }
+        return ordersIdList;
     }
 
 
-//    @Step("Get an orders List   /api/v1/orders")
-//    public static com.example.OrdersList getResponseOfGetList (){
-//        com.example.OrdersList ordersListGet = given()
-//                .header("Content-type", "application/json")
-//                .get("/api/v1/orders").body().as(ordersList.class);
-//
-//        return ordersListGet;
-//    }
+    @Step("Get an orders List   /api/v1/orders")
+    public static com.example.OrdersList getResponseOfGetList (){
+        OrdersList ordersListGet = given()
+                .header("Content-type", "application/json")
+                .get("/api/v1/orders").body().as(OrdersList.class);
+
+        return ordersListGet;
+    }
+
+    @Step("Get an orders List of the certain courier   /api/v1/orders?courierId=id")
+    public static com.example.OrdersList getResponseCourierGetList (Integer courierId){
+        OrdersList ordersListGet = given()
+                .header("Content-type", "application/json")
+                .get("/api/v1/orders?courierId=" + courierId).body().as(OrdersList.class);
+
+        return ordersListGet;
+    }
+
+    @Step ("Accept certain Order by certain courier ")
+    public static Response courierAcceptOrder(Integer id, Integer courierId) {
+        AcceptPutBody acceptPutBody = new AcceptPutBody(id,courierId);
+
+        String handleAcceptOrder = "/api/v1/orders/accept/" +id + "?courierId=" + courierId;
+        System.out.println("handle = " + handleAcceptOrder);
+        Response response = given()
+                .header("Content-type", "application/json")
+                .and().body(acceptPutBody).when().put(handleAcceptOrder);
+        return response;
+    }
+
+    @Step ("Id Courier get")
+    public static Integer getCourierIdCertainCourier (Courier courier) {
+        CourierLogin courierLogin = new CourierLogin(courier.getLogin(),courier.getPassword());         // login and get a courier id to the list to Delete
+        Integer courierId = Test_CourierLogin.getCourierIdFromLogin(courierLogin);
+        return courierId;
+    }
+
+    @Step ("Get default order with required metro station id.")
+    public static Integer getTrackOfOrderMetroStation(String metroStation) {
+        Order order = Order.defaultOrderGet();
+        order.setMetroStation(metroStation);
+        Response responsePostOrder = Test_OrderCreateColorParametrized.sendPostRequestOrderCreate(order);
+        Order orderBody = responsePostOrder.as(Order.class);
+        Integer track = orderBody.getTrack();
+        return track;
+    }
+
+    @Step("Get Order id by track ")
+    public static Integer getOrderId (Integer track){
+        String handle = "/api/v1/orders/track?t=" + track;
+      Integer   id  = given()
+                .header("Content-type", "application/json")
+                .get(handle).then().extract().path("order.id");
 
 
-
-//
-//    public static com.example.OrdersList getResponseOfGetList (){
-//        com.example.OrdersList ordersListBody = given()
-//                .header("Content-type", "application/json")
-//                .get("/api/v1/orders").body().as(com.example.OrdersList.class);
-//
-//        return ordersListBody;
-//    }
-
+        System.out.println("id= " + id);
+        return id;
+    }
 }

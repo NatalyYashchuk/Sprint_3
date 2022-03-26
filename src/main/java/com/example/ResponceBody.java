@@ -1,3 +1,5 @@
+package com.example;
+
 public class ResponceBody {
     private Boolean ok;
     private String message;
