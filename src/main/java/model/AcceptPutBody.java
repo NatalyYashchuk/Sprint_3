@@ -1,11 +1,10 @@
-package com.example;
+package model;
 
 public class AcceptPutBody {
     private Integer id;
     private Integer courierId;
 
-
-    public AcceptPutBody(Integer id, Integer courierId){
+    public AcceptPutBody(Integer id, Integer courierId) {
         this.id = id;
         this.courierId = courierId;
     }

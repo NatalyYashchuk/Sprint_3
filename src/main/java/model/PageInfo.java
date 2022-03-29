@@ -1,10 +1,9 @@
-package com.example;
+package model;
 
 public class PageInfo {
     private Integer page;
     private Integer total;
     private Integer limit;
-
 
     public Integer getPage() {
         return page;

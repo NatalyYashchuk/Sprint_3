@@ -1,4 +1,4 @@
-package com.example;
+package model;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -9,11 +9,11 @@ public class Order {
     private Integer id;
     private Integer courierId;
     private String firstName;
-    private  String lastName;
+    private String lastName;
     private String address;
     private String metroStation;
     private String phone;
-    private  Integer rentTime;
+    private Integer rentTime;
     private String deliveryDate;
     private Integer track;
     private List<String> color;
@@ -21,8 +21,6 @@ public class Order {
     private String createdAt;
     private String updatedAt;
     private Integer status;
-
-
 
     public Order(Integer id, Integer courierId, String firstName, String lastName, String address,
                  String metroStation, String phone, Integer rentTime, String deliveryDate, Integer track,
@@ -44,24 +42,20 @@ public class Order {
         this.status = status;
     }
 
-
-
-
-    public  static Order defaultOrderGet (){
-       Integer id = (int) Math.round(Math.random());
-       Integer courierId = (int) Math.round(Math.random());
+    public static Order defaultOrderGet() {
+        Integer id = (int) Math.round(Math.random());
+        Integer courierId = (int) Math.round(Math.random());
         String any = RandomStringUtils.randomAlphabetic(1);
-        String anyI = String.valueOf (Math.round(1));
+        String anyI = String.valueOf(Math.round(1));
 
-
-        String firstName = "Kate"+any;
-        String lastName = "Monsoon"+any;
-        String address = "Krakov, Sunshine str. 32"+any;
+        String firstName = "Kate" + any;
+        String lastName = "Monsoon" + any;
+        String address = "Krakov, Sunshine str. 32" + any;
         String metroStation = "4";
-        String phone = "+7 800 455 45 4"+anyI;
+        String phone = "+7 800 455 45 4" + anyI;
         Integer rentTime = 4;
-        String deliveryDate = "2020-06-0"+anyI;
-        Integer track = (int) Math.round(Math.random()*1000000);
+        String deliveryDate = "2020-06-0" + anyI;
+        Integer track = (int) Math.round(Math.random() * 1000000);
         List<String> color = new ArrayList<>();
         color.add("BLACK");
 
@@ -73,7 +67,7 @@ public class Order {
 
         Order defaultOrder = new Order(id, courierId, firstName, lastName, address,
                 metroStation, phone, rentTime, deliveryDate, track,
-                 color,  comment,  createdAt,  updatedAt, status);
+                color, comment, createdAt, updatedAt, status);
         return defaultOrder;
     }
 
@@ -129,7 +123,7 @@ public class Order {
         this.status = status;
     }
 
-    public  String getFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
@@ -200,8 +194,6 @@ public class Order {
     public void setComment(String comment) {
         this.comment = comment;
     }
-
-
 
 
 }

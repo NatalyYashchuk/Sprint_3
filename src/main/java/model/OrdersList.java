@@ -1,12 +1,11 @@
-package com.example;
+package model;
 
 import java.util.List;
 
 public class OrdersList {
-
-private List<Order> orders;
-private PageInfo pageInfo;
-private List<Station> availableStations;
+    private List<Order> orders;
+    private PageInfo pageInfo;
+    private List<Station> availableStations;
 
     public List<Order> getOrders() {
         return orders;

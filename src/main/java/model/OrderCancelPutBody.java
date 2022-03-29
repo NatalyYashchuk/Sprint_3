@@ -1,11 +1,11 @@
-package com.example;
+package model;
 
 public class OrderCancelPutBody {
-private Integer track;
+    private Integer track;
 
-public OrderCancelPutBody(Integer track){
-    this.track = track;
-}
+    public OrderCancelPutBody(Integer track) {
+        this.track = track;
+    }
 
     public Integer getTrack() {
         return track;

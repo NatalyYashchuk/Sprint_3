@@ -1,10 +1,9 @@
-package com.example;
+package model;
 
 public class Station {
     private String name;
     private String number;
     private String color;
-
 
     public String getName() {
         return name;

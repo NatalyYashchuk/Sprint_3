@@ -1,4 +1,4 @@
-package com.example;
+package model;
 
 public class DeletePostBody {
     private String id;
