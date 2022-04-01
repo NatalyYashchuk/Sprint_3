@@ -62,7 +62,6 @@ public class CourierCreateTest {
     @Description("It's impossible to create the second courier with the same obligatory field values")
     public void testCourierTheSameCreateImpossible() {
         Response responsePostFirst = CourierClient.sendPostRequestCourier(courier);
-        responsePostFirst.then().assertThat().body("ok", equalTo(true));
 
         Response responsePostSame = CourierClient.sendPostRequestCourier(courier);
         int statusCode = responsePostSame.then().extract().statusCode();
@@ -99,7 +98,6 @@ public class CourierCreateTest {
     @Description("It's impossible to create a courier with login  which is used already")
     public void testCourierWithUsedLoginCreateImpossible() {
         Response responsePostFirst = CourierClient.sendPostRequestCourier(courier);
-        responsePostFirst.then().assertThat().body("ok", equalTo(true));
 
         ArrayList<String> courierData2 = Utils.getCourierData(fieldsSet, signsQuantity);
         courier = new Courier(courierData.get(0), courierData2.get(1), courierData2.get(2));
