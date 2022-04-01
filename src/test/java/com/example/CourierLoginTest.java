@@ -17,6 +17,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 
 public class CourierLoginTest {
@@ -53,8 +54,9 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Login return id")
     public void testCourierLoginGetIdSuccessfully() {
-        Assert.assertTrue(!idListToDelete.isEmpty());
-
+       Response loginResponse =  CourierClient.sendPostRequestCourierLogin(courierLogin);
+        int id = loginResponse.then().extract().path("id");
+        Assert.assertNotNull(id);
     }
 
     @Test
@@ -62,8 +64,8 @@ public class CourierLoginTest {
     @Description("Status code is 200 when  a courier login with all obligatory fields successfully.")
     public void testCourierLoginSuccessfully() {
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then().assertThat().statusCode(200);
-
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        Assert.assertEquals("Status code required 200", 200, statusCode);
     }
 
     @Test
@@ -72,11 +74,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossibleLoginNull() {
         courierLogin.setLogin(null);
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then()
-                .assertThat()
-                .statusCode(400)
-                .and()
-                .body("message", equalTo("Недостаточно данных для входа"));
+
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Недостаточно данных для входа";
+
+        Assert.assertEquals("Status code required 400", 400, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
     @Test
@@ -85,11 +89,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossibleLoginEmptySpace() {
         courierLogin.setLogin(" ");
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then()
-                .assertThat()
-                .statusCode(404)
-                .and()
-                .body("message", equalTo("Учетная запись не найдена"));
+
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Учетная запись не найдена";
+
+        Assert.assertEquals("Status code required 404", 404, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
     @Test
@@ -99,11 +105,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossiblePasswordNull() {
         courierLogin.setPassword(null);
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then()
-                .assertThat()
-                .statusCode(400)
-                .and()
-                .body("message", equalTo("Недостаточно данных для входа"));
+
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Недостаточно данных для входа";
+
+        Assert.assertEquals("Status code required 400", 400, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
 
@@ -113,12 +121,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossiblePasswordEmptySpace() {
         courierLogin.setPassword(" ");
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then()
-                .assertThat()
-                .statusCode(404)
-                .and()
-                .body("message", equalTo("Учетная запись не найдена"));
 
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Учетная запись не найдена";
+
+        Assert.assertEquals("Status code required 404", 404, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
     @Test
@@ -127,11 +136,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossibleLoginIncorrect() {
         courierLogin.setLogin("Login" + Math.random());
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then().assertThat()
-                .statusCode(404)
-                .and()
-                .body("message", equalTo("Учетная запись не найдена"));
 
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Учетная запись не найдена";
+
+        Assert.assertEquals("Status code required 404", 404, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
     @Test
@@ -140,10 +151,13 @@ public class CourierLoginTest {
     public void testCourierLoginImpossiblePasswordIncorrect() {
         courierLogin.setPassword("Password" + Math.random());
         Response responsePostLogin = CourierClient.sendPostRequestCourierLogin(courierLogin);
-        responsePostLogin.then().assertThat()
-                .statusCode(404)
-                .and()
-                .body("message", equalTo("Учетная запись не найдена"));
+
+        int statusCode = responsePostLogin.then().extract().statusCode();
+        String message = responsePostLogin.then().extract().path("message");
+        String requiredMessage = "Учетная запись не найдена";
+
+        Assert.assertEquals("Status code required 404", 404, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
 

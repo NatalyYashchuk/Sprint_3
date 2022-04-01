@@ -9,6 +9,7 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +36,7 @@ public class OrderCreateColorParametrizedTest {
         this.colorList = colorList;
     }
 
-    @Parameterized.Parameters(name = "Тестовые данные: {0} {1}")
+    @Parameterized.Parameters(name = "Тестовые данные: {0}")
     public static Object[][] data() {
         return new Object[][]{
                 {Arrays.asList("BLACK")},
@@ -51,9 +52,8 @@ public class OrderCreateColorParametrizedTest {
     @Description("It's possible to create  a new order.")
     public void orderCreateSuccessfully() {
         Response responsePostOrder = OrderClient.sendPostRequestOrderCreate(order);
-        System.out.println(responsePostOrder.body().asString());
-        responsePostOrder.then().assertThat()
-                .statusCode(201);
+        int statusCode = responsePostOrder.then().extract().statusCode();
+        Assert.assertEquals("Status code isn't 201 as required",201,statusCode);
     }
 
     @Test
@@ -63,8 +63,9 @@ public class OrderCreateColorParametrizedTest {
         Response responsePostOrder = OrderClient.sendPostRequestOrderCreate(order);
         Order orderBody = responsePostOrder.as(Order.class);
         Integer track = orderBody.getTrack();
-
         idListToDelete.add(track);
+        Assert.assertNotNull("Track is empty",track);
+
     }
 
     @After

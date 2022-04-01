@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import model.Courier;
 import model.CourierLogin;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
@@ -40,13 +41,9 @@ public class CourierCreateTest {
     @Description("It's possible to create  a new courier.")
     public void testCourierNewCreateSuccessfully() {
         Response responsePost = CourierClient.sendPostRequestCourier(courier);
+        Boolean bodyOk = responsePost.then().extract().path("ok");
 
-        responsePost.then().assertThat().statusCode(201)
-                .and()
-                .body("ok", equalTo(true));
-
-        Integer id = CourierClient.getCourierIdFromLogin(courierLogin);
-        idListToDelete.add(id);
+        Assert.assertEquals("Courier hasn't created successfully", true, bodyOk);
     }
 
     @Test
@@ -54,12 +51,9 @@ public class CourierCreateTest {
     @Description("Create model.Courier successfully. Return correct response code")
     public void testCourierCreateSuccessfullyResponceCodeCorrect() {
         Response responsePost = CourierClient.sendPostRequestCourier(courier);
-        System.out.println(responsePost.body().asString());
-        responsePost.then().assertThat()
-                .statusCode(201);
+        int statusCode = responsePost.then().extract().statusCode();
 
-        Integer id = CourierClient.getCourierIdFromLogin(courierLogin);
-        idListToDelete.add(id);
+        Assert.assertEquals("Status code required 201", 201, statusCode);
     }
 
 
@@ -70,15 +64,13 @@ public class CourierCreateTest {
         Response responsePostFirst = CourierClient.sendPostRequestCourier(courier);
         responsePostFirst.then().assertThat().body("ok", equalTo(true));
 
-        Integer id = CourierClient.getCourierIdFromLogin(courierLogin);
-        idListToDelete.add(id);
-
         Response responsePostSame = CourierClient.sendPostRequestCourier(courier);
-        responsePostSame.then()
-                .assertThat()
-                .statusCode(409)
-                .and()
-                .body("message", equalTo("Этот логин уже используется. Попробуйте другой."));
+        int statusCode = responsePostSame.then().extract().statusCode();
+        String message = responsePostSame.then().extract().path("message");
+        String requiredMessage = "Этот логин уже используется. Попробуйте другой.";
+
+        Assert.assertEquals("Status code required 409", 409, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
 
@@ -93,12 +85,12 @@ public class CourierCreateTest {
             courier = new Courier(courierData.get(0), courierData.get(1), courierData.get(2));
             Response responsePost = CourierClient.sendPostRequestCourier(courier);
 
-            System.out.println(responsePost.body().asString());
-            responsePost.then()
-                    .assertThat()
-                    .statusCode(400)
-                    .and()
-                    .body("message", equalTo("Недостаточно данных для создания учетной записи"));
+            int statusCode = responsePost.then().extract().statusCode();
+            String message = responsePost.then().extract().path("message");
+            String requiredMessage = "Недостаточно данных для создания учетной записи";
+
+            Assert.assertEquals("Status code required 400", 400, statusCode);
+            Assert.assertEquals("Message dosn't match", requiredMessage, message);
         }
     }
 
@@ -109,21 +101,22 @@ public class CourierCreateTest {
         Response responsePostFirst = CourierClient.sendPostRequestCourier(courier);
         responsePostFirst.then().assertThat().body("ok", equalTo(true));
 
-        Integer id = CourierClient.getCourierIdFromLogin(courierLogin);
-        idListToDelete.add(id);
-
         ArrayList<String> courierData2 = Utils.getCourierData(fieldsSet, signsQuantity);
         courier = new Courier(courierData.get(0), courierData2.get(1), courierData2.get(2));
         Response responsePostSame2 = CourierClient.sendPostRequestCourier(courier);
-        responsePostSame2.then()
-                .assertThat()
-                .statusCode(409)
-                .and()
-                .body("message", equalTo("Этот логин уже используется. Попробуйте другой."));
+
+        int statusCode = responsePostSame2.then().extract().statusCode();
+        String message = responsePostSame2.then().extract().path("message");
+        String requiredMessage = "Этот логин уже используется. Попробуйте другой.";
+
+        Assert.assertEquals("Status code required 409", 409, statusCode);
+        Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
     @After
     public void clearStand() {
+        Integer id = CourierClient.getCourierIdFromLogin(courierLogin);
+        idListToDelete.add(id);
         CourierClient.deleteAllCouriers(idListToDelete);
     }
 

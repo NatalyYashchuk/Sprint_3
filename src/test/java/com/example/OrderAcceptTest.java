@@ -10,6 +10,7 @@ import model.Courier;
 import model.CourierLogin;
 import model.Order;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +58,9 @@ public class OrderAcceptTest {
     @Description("Create a courier, Create an Order, Accept An Order")
     public void testCourierAcceptAnOrder() {
         Response response = OrderClient.courierAcceptOrder(id, courierId);
-        response.then().assertThat().statusCode(200);
+
+        int statusCode = response.then().extract().statusCode();
+        Assert.assertEquals("Status code required 200", 200, statusCode);
     }
 
     @After
