@@ -7,10 +7,7 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import model.Courier;
 import model.CourierLogin;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +95,7 @@ public class CourierLoginTest {
         Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
+    @Ignore
     @Test
     @DisplayName("Obligatory field password = null.Login is impossible.  /api/v1/courier/login")
     @Description("Message: Учетная запись не найдена, and StatusCode = 404 ")

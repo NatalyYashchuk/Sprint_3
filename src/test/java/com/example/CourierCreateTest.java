@@ -7,10 +7,8 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import model.Courier;
 import model.CourierLogin;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +70,7 @@ public class CourierCreateTest {
         Assert.assertEquals("Message dosn't match", requiredMessage, message);
     }
 
-
+    @Ignore
     @Test
     @DisplayName("Can't create a courier without an obligatory field /api/v1/courier")
     @Description("It's impossible to create a courier if any obligatory field equals to null. Status code 400")
